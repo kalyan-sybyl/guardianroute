@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && !request.resource.data.keys().hasAny(['role', 'admin'])
+        && request.resource.data.keys().hasOnly([
+          'displayName', 'photoUrl', 'createdAt', 'lastActiveAt'
+        ]);
+      allow update: if isOwner(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role', 'admin']);
+      allow delete: if false;
+    }
+
+    match /hazardReports/{reportId} {
+      allow read: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.imageStoragePath is string
+        && request.resource.data.location is latlng
+        && request.resource.data.keys().hasOnly([
+          'userId',
+          'status',
+          'location',
+          'imageStoragePath',
+          'audioStoragePath',
+          'transcript',
+          'heading',
+          'speed',
+          'createdAt'
+        ]);
+      allow update, delete: if false;
+    }
+
+    match /hazards/{hazardId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+
+      match /reports/{reportId} {
+        allow read: if isSignedIn();
+        allow write: if false;
+      }
+
+      match /confirmations/{confirmationId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn()
+          && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    match /sensorEvents/{eventId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /roadSegments/{segmentId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /routeAssessments/{assessmentId} {
+      allow read: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /guardianPulseEvents/{pulseId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    match /config/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

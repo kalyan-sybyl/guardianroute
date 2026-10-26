@@ -1,0 +1,46 @@
+# Secrets and local Firebase
+**/google-services.json
+**/GoogleService-Info.plist
+**/.env
+**/.env.*
+!**/.env.example
+**/local.properties
+**/key.properties
+**/*.keystore
+**/*.jks
+**/.firebase/
+**/firebase-debug.log
+**/firestore-debug.log
+**/ui-debug.log
+**/pubsub-debug.log
+**/database-debug.log
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/.packages
+mobile/.pub/
+mobile/.pub-cache/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+**/*.iml
+
+# Node (Cloud Functions, command center, scripts)
+**/node_modules/
+functions/lib/
+command-center/dist/
+**/.vite/
+*.tsbuildinfo
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+coverage/
+*.lcov
+
+# Local reference (not for the repo)
+GUARDIANROUTE_MASTER_PROMPT.md
